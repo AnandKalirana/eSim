@@ -72,7 +72,9 @@ function installNghdl
     # Do not trap on error of any command. Let NGHDL script handle its own errors.
     trap "" ERR
 
-    ./install-nghdl.sh --install       # Install NGHDL
+    sed -i 's/"24.04")/"24.04" | "25.04" | "26.04")/' install-nghdl.sh
+    sed -i 's/libcanberra-gtk-module //' install-nghdl-scripts/install-nghdl-24.04.sh
+	./install-nghdl.sh --install       # Install NGHDL
         
     # Set trap again to error_exit function to exit on errors
     trap error_exit ERR
@@ -135,6 +137,13 @@ function installKicad
 
     # Detect Ubuntu version
     ubuntu_version=$(lsb_release -rs)
+	if [[ "$ubuntu_version" == "25.04" || "$ubuntu_version" == "26.04" ]]; then
+        echo "Ubuntu $ubuntu_version detected: installing KiCad from Ubuntu repositories."
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends kicad kicad-footprints kicad-libraries kicad-symbols kicad-templates
+        echo "KiCad installation completed successfully!"
+        return 0
+    fi
 
     # Define KiCad PPAs based on Ubuntu version
     if [[ "$ubuntu_version" == "24.04" ]]; then
